@@ -13,3 +13,5 @@ const source = fs.readFileSync(inboxPath,'utf8')
 // the apis/methods we can use for this contract. like getMessage, setMessage, etc
 
 module.exports = solc.compile(source,1).contracts[':Inbox']; // export big object and contracts
+// interface = JS API
+// bytecode = actual raw compiled contract
