@@ -9,6 +9,7 @@ const {interface, bytecode } = require('../compile');
 
 let accounts;
 let inbox;
+const INITIAL_MESSAGE = "Hi world!";
 // beforeEach is only executed when there's at least 1 'it' test funct created
 beforeEach(async () => {
     // get a list of all accounts
@@ -16,13 +17,24 @@ beforeEach(async () => {
     console.log("accounts: ", accounts);
     // use one of the accounts to deploy the contract
     inbox = await new web3.eth.Contract(JSON.parse(interface))
-        .deploy({data: bytecode, arguments:['Hi there!! (initial msg)']})
+        .deploy({data: bytecode, arguments:[INITIAL_MESSAGE]})
         .send({from:accounts[0], gas:'1000000'}) // 1m gas
 })
 
 describe('Inbox', () => {
     it('deploys a contract', () => {
         // creating only to check if beforeEach() is working.
-        console.log('inbox:' , inbox);
+        // assert ok
+        assert.ok(inbox.options.address); // if value is null or undefined = test will fail
     })
+    it('has a default message', async () => {
+        const message = await inbox.methods.message().call();
+        assert.equal(message, INITIAL_MESSAGE )
+    })
+    it('can change the message', async() => {
+        const new_message = "New Message ..."
+        inbox.methods.setMessage(message).send({from: accounts[0]}) // modify a contract (send transaction)
+        const message = await inbox.methods.message().call();
+        assert.equal(message, new_message);
+    } )
 })
